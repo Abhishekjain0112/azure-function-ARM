@@ -1,0 +1,136 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+
+        "name function app": {
+             "type": "string",
+            "defaultValue":  "test-fun-app100"
+        },
+        "location": {
+             "type": "string",
+            "defaultValue":  "Central US"
+        },
+        "hostingEnvironment": {
+             "type": "string",
+            "defaultValue":  ""
+        },
+        "hostingPlanName": {
+             "type": "string",
+            "defaultValue": "ASP-platformtestingrg-850a"
+        },
+        "serverFarmResourceGroup": {
+             "type": "string",
+            "defaultValue":  "platform-testing-rg"
+        },
+        "alwaysOn": {
+             "type": "bool",
+            "defaultValue":  false
+        },
+        "storageAccountName": {
+              "type": "string",
+            "defaultValue":  "platformtestingsg"
+        },
+        "sku": {
+             "type": "string",
+            "defaultValue": "Dynamic"
+        },
+        "skuCode": {
+             "type": "string",
+            "defaultValue": "Y1"
+        },
+        "workerSize": {
+             "type": "string",
+            "defaultValue": "0"
+        },
+        "workerSizeId": {
+             "type": "string",
+            "defaultValue":  "0"
+        },
+        "numberOfWorkers": {
+             "type": "string",
+            "defaultValue":  "1"
+        },
+        "javaVersion": {
+             "type": "string",
+            "defaultValue":  "1.8"
+        }
+
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('name function app')]",
+            "type": "Microsoft.Web/sites",
+            "kind": "functionapp",
+            "location": "[parameters('location')]",
+            "tags": {
+                "hey name": "hello value"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]"
+            ],
+            "properties": {
+                "name": "[parameters('name function app')]",
+                "siteConfig": {
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "java"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "937662b8-12dd-4b47-8bfb-25b7bf29640c"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "InstrumentationKey=937662b8-12dd-4b47-8bfb-25b7bf29640c"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value,';EndpointSuffix=','core.windows.net')]"
+                        },
+                        {
+                            "name": "WEBSITE_CONTENTSHARE",
+                            "value": "[concat(toLower(parameters('name function app')), 'bcfc')]"
+                        }
+                    ],
+                    "javaVersion": "[parameters('javaVersion')]"
+                },
+                "serverFarmId": "[concat('/subscriptions/',subscription().id,'/resourcegroups/', parameters('serverFarmResourceGroup'), '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]",
+                "hostingEnvironment": "[parameters('hostingEnvironment')]",
+                "clientAffinityEnabled": true
+            }
+        },
+        {
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('hostingPlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[parameters('location')]",
+            "kind": "",
+            "tags": {
+                "hey name": "hello value"
+            },
+            "dependsOn": [],
+            "properties": {
+                "name": "[parameters('hostingPlanName')]",
+                "workerSize": "[parameters('workerSize')]",
+                "workerSizeId": "[parameters('workerSizeId')]",
+                "numberOfWorkers": "[parameters('numberOfWorkers')]",
+                "hostingEnvironment": "[parameters('hostingEnvironment')]"
+            },
+            "sku": {
+                "Tier": "[parameters('sku')]",
+                "Name": "[parameters('skuCode')]"
+            }
+        }
+    ]
+}

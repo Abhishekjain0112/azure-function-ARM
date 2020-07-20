@@ -1,0 +1,7 @@
+{
+  "azureFunctions.deploySubpath": "target/azure-functions/new-fun-folder-artifact-id-1594965810625",
+  "azureFunctions.projectLanguage": "Java",
+  "azureFunctions.projectRuntime": "~2",
+  "debug.internalConsoleOptions": "neverOpen",
+  "azureFunctions.preDeployTask": "package"
+}
